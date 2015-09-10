@@ -1,5 +1,7 @@
 Tasks = new Mongo.Collection("tasks");
 
+// Ass 'notes' collection
+Notes = new Mongo.Collection("notes");
 if (Meteor.isServer) {
 
   Meteor.publish("tasks",function(){
