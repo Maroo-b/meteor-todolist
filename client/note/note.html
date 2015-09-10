@@ -1,0 +1,18 @@
+<template name="note">
+ 
+  <header>
+     <a href="{{pathFor route='home'}}">Back</a>
+    <h2>note</h2>
+  </header>
+  {{note}}
+  <button class="edit-btn">Edit</button>
+  {{#with editPressed}}
+  <form class="new-note">
+    <input type="text" name="content" placeholder="Add a new note" value="{{val}}">
+    <input type="submit" value="Save Note">
+  </form>
+ {{/with}}
+ {{#if content}}
+  <li>{{content}}  <button class="delete">&times;</button></li>
+ {{/if}}
+</template>

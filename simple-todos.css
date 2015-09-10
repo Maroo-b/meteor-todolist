@@ -125,3 +125,15 @@ header .hide-completed {
     padding-bottom: 5px;
   }
 }
+
+/* note */
+h2{
+  text-align: center;
+}
+.edit-btn{
+  margin-top: 10px;
+  margin-left: 10%;
+}
+.new-note {
+  padding-left: 10%;
+}

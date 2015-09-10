@@ -1,9 +1,13 @@
 Tasks = new Mongo.Collection("tasks");
 
-// Ass 'notes' collection
+// Add 'notes' collection
 Notes = new Mongo.Collection("notes");
-if (Meteor.isServer) {
 
+
+if (Meteor.isServer) {
+  Meteor.publish("notes",function(){
+    return Notes.find({});
+  });
   Meteor.publish("tasks",function(){
     return Tasks.find({
       $or: [
@@ -15,7 +19,42 @@ if (Meteor.isServer) {
 };
 if (Meteor.isClient) {
   Meteor.subscribe("tasks");
-  Template.body.helpers({
+  Meteor.subscribe("notes");
+  Session.setDefault('editForm', false);
+  Template.note.helpers({
+    editPressed: function(){
+      return Session.get('editForm');
+
+    },
+
+    val: function(){
+      var note = Notes.findOne({task_id: Router.current().params._id});
+      if(note){
+        return note.content;
+      }
+    }
+    
+  });
+  Template.note.events({
+    "click .edit-btn": function(){
+      Session.set('editForm', !Session.get('editForm'));
+    },
+
+    "submit .new-note":function(event){
+
+      event.preventDefault();
+      var note = event.target.content.value;
+      Meteor.call('addNote',note,Router.current().params._id);
+      Session.set('editForm', false);
+    },
+     "click .delete": function(){
+      Meteor.call("removeNote", this._id);
+    }
+  });
+
+
+
+  Template.home.helpers({
     tasks: function(){
       if(Session.get('hideCompleted')){
         // If hide completed is checked, filter tasks
@@ -32,9 +71,8 @@ if (Meteor.isClient) {
       return Tasks.find({checked: {$ne: true}}).count();
     }
   });
-  Template.body.events({
+  Template.home.events({
     "submit .new-task": function(event){
-      console.log(event);
       //Prevent default browser form submit
       event.preventDefault();
 
@@ -71,6 +109,15 @@ if (Meteor.isClient) {
   });
 }
 Meteor.methods({
+  addNote: function(note, taskId){
+    Notes.insert({
+      content: note,
+      task_id: taskId
+    });
+  },
+  removeNote: function(noteId){
+    Notes.remove(noteId);
+  },
   addTask: function(text){
 
     if (!Meteor.userId()) {
